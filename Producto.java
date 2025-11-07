@@ -1,24 +1,27 @@
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class Producto implements Comparable<Producto> {
     private String nombre;
     private int stockActual;
-    private List<String> historialMovimientos;
+    
+ 
+    // private List<String> historialMovimientos;
+    private SinglyLinkedList<String> historialMovimientos;
 
     public Producto(String nombre, int stockInicial) {
         this.nombre = nombre;
         this.stockActual = stockInicial;
-        this.historialMovimientos = new ArrayList<>();
-        // Solo registrar movimiento si es una creación real
+        
+ 
+        // this.historialMovimientos = new ArrayList<>();
+        this.historialMovimientos = new SinglyLinkedList<>();
+        
         if (stockInicial > 0){
            registrarMovimiento("Creación de producto con stock inicial", stockInicial);
         }
     }
-
 
     // Gestiona los métodos del stock del producto
     public void registrarEntrada(int cantidad) {
@@ -40,7 +43,10 @@ public class Producto implements Comparable<Producto> {
     private void registrarMovimiento(String tipo, int cantidad) {
         String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String registro = String.format("[%s] %s: %d unidades. Stock resultante: %d", fechaHora, tipo, cantidad, this.stockActual);
-        this.historialMovimientos.add(registro);
+        
+        // --- CAMBIO ---
+        // this.historialMovimientos.add(registro);
+        this.historialMovimientos.addLast(registro); // Usamos el método de nuestra lista
     }
 
     // Getters
@@ -52,11 +58,13 @@ public class Producto implements Comparable<Producto> {
         return stockActual;
     }
 
-    public List<String> getHistorialMovimientos() {
+  
+    // public List<String> getHistorialMovimientos() {
+    public SinglyLinkedList<String> getHistorialMovimientos() {
         return historialMovimientos;
     }
 
-    // Método compareTo para permitir el ordenamiento nativo por nombre
+    // (El resto de la clase no cambia)
     @Override
     public int compareTo(Producto otro) {
         return this.nombre.compareTo(otro.getNombre());
