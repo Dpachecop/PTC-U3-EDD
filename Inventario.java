@@ -1,32 +1,44 @@
-
+// import java.util.ArrayList; // (Cambiamos ArrayList por LinkedList)
+import java.util.Collections;
+import java.util.List;
+import java.util.LinkedList; // <--- Se importa la lista nativa
 import java.util.Optional;
+
 
 
 public class Inventario {
 
 
-    // private List<Producto> productos;
-    private DoublyLinkedList<Producto> productos;
+    // private DoublyLinkedList<Producto> productos; // (Manual)
+    private List<Producto> productos; // (Nativa)
 
     public Inventario() {
-     
-        // this.productos = new ArrayList<>();
-        this.productos = new DoublyLinkedList<>();
+
+        // this.productos = new DoublyLinkedList<>(); // (Manual)
+        this.productos = new LinkedList<>(); // (Nativa)
     }
 
     // --- MÉTODOS DE GESTIÓN DE PRODUCTOS (MODIFICADO) ---
     public void agregarProducto(Producto producto) {
-        // Usamos nuestra propia búsqueda, ya que la binaria no aplica
+        // Usamos la búsqueda binaria (que ahora es posible)
+        // Nota: La lista debe estar ordenada para que esto funcione.
+        
+
+        // Volvemos a usar la búsqueda binaria.
+        // Nota: binarySearch en una LinkedList es LENTO (O(n)), 
+        // pero funcional y cumple con la PARTE B.
+        // En un escenario real, si la búsqueda binaria es prioritaria,
+        // se usaría un ArrayList.
+        
         if (buscarProducto(producto.getNombre()).isEmpty()) {
             
-    
-            // this.productos.add(producto);
-            this.productos.addLast(producto);
+
+            // this.productos.addLast(producto); // (Manual)
+            this.productos.add(producto); // (Nativa)
             
-        
-            // Ya no podemos usar Collections.sort() en nuestra lista manual.
-            // La lista estará desordenada hasta que llamemos al método de burbuja.
-            // Collections.sort(this.productos); 
+          
+            // Mantenemos la lista ordenada para la búsqueda binaria.
+            Collections.sort(this.productos); 
             
             System.out.println("Producto '" + producto.getNombre() + "' agregado al inventario.");
         } else {
@@ -34,63 +46,35 @@ public class Inventario {
         }
     }
 
-  
-    // 1. Búsqueda (MODIFICADA - Búsqueda Lineal Manual)
-    // Se elimina la búsqueda binaria [Collections.binarySearch]
+
+
+    // 1. Búsqueda con Búsqueda Binaria (REACTIVADA)
     public Optional<Producto> buscarProducto(String nombre) {
-        // Iteramos manualmente sobre nuestra DoublyLinkedList
-        // (Esto funciona porque la hicimos 'Iterable')
-        for (Producto p : productos) {
-            if (p.getNombre().equals(nombre)) {
-                return Optional.of(p);
-            }
+        // Creamos un producto temporal solo con el nombre para usar en la búsqueda.
+        int index = Collections.binarySearch(productos, new Producto(nombre, 0));
+
+        if (index < 0) {
+            return Optional.empty(); // No se encontró el producto.
+        } else {
+          
+            // return Optional.of(productos.getNode(index).value); // (Manual)
+            return Optional.of(productos.get(index)); // (Nativa)
         }
-        return Optional.empty(); // No se encontró
     }
 
 
-   
 
-    // 2. Ordenamiento de Burbuja (Manual)
-    // (Este método se vuelve MUY INEFICIENTE (O(n^3)) con listas enlazadas
-    // porque get(j) y set(j) son O(n) cada uno, pero sigue funcionando
-    // gracias a que implementamos get() y set() en DoublyLinkedList)
-    public void ordenarPorNombreBurbuja() {
-        int n = productos.size();
-        for (int i = 0; i < n - 1; i++) {
-            for (int j = 0; j < n - i - 1; j++) {
-                
-                // --- CAMBIO (Funcional) ---
-                // productos.get(j) ahora llama a nuestro método manual
-                if (productos.get(j).getNombre().compareTo(productos.get(j + 1).getNombre()) > 0) {
-                    
-                    // --- CAMBIO (Funcional) ---
-                    Producto temp = productos.get(j);
-                    // productos.set(j, productos.get(j + 1)); // Llama a nuestro set()
-                    // productos.set(j + 1, temp); // Llama a nuestro set()
-                
-                    
-        
-                    productos.set(j, productos.get(j + 1));
-                    productos.set(j + 1, temp);
-                }
-            }
-        }
-        System.out.println("\nInventario ordenado manualmente (Burbuja sobre Lista Doble).");
-    }
 
-    // 3. Ordenamiento con Herramienta Nativa de Java (MODIFICADO)
+
+    // 3. Ordenamiento con Herramienta Nativa de Java (REACTIVADO)
     public void ordenarPorNombreNativo() {
-        // --- CAMBIO (DESHABILITADO) ---
-        // Collections.sort(productos); // <-- ESTO YA NO COMPILA
-        
-        System.out.println("\nError: Collections.sort() no puede usarse sobre nuestra lista manual.");
-        System.out.println(" (Este paso corresponde a la PARTE B de la actividad)");
+        Collections.sort(productos); // ¡Esto vuelve a funcionar!
+        System.out.println("\nInventario ordenado con herramienta nativa (Collections.sort).");
     }
 
 
     // --- MÉTODOS PARA REGISTRAR MOVIMIENTOS ---
-    // (Sin cambios, gracias a la búsqueda secuencial)
+
     public void registrarEntrada(String nombreProducto, int cantidad) {
         Optional<Producto> productoOpt = buscarProducto(nombreProducto);
         if (productoOpt.isPresent()) {
@@ -114,16 +98,18 @@ public class Inventario {
         }
     }
 
+    // --- MÉTODOS DE REPORTE ---
+    // (Sin cambios, funcionan perfecto)
     public void generarReporteExistencias() {
         System.out.println("\n--- REPORTE DE EXISTENCIAS ---");
-        if (productos.isEmpty()) { // Llama a nuestro isEmpty()
+        if (productos.isEmpty()) { 
             System.out.println("El inventario está vacío.");
             return;
         }
         System.out.println("------------------------------------");
         System.out.printf("%-20s | %s\n", "Producto", "Stock Actual");
         System.out.println("------------------------------------");
-        for (Producto p : productos) { // Usa nuestro iterador
+        for (Producto p : productos) { 
             System.out.println(p); 
         }
         System.out.println("------------------------------------\n");
@@ -131,18 +117,16 @@ public class Inventario {
 
     public void generarReporteMovimientos() {
         System.out.println("\n--- REPORTE DE MOVIMIENTOS ---");
-        if (productos.isEmpty()) { // Llama a nuestro isEmpty()
+        if (productos.isEmpty()) { 
             System.out.println("El inventario está vacío.");
             return;
         }
-        for (Producto p : productos) { // Usa nuestro iterador
+        for (Producto p : productos) { 
             System.out.println("\n--- Historial de: " + p.getNombre() + " ---");
             
-            // Llama a nuestro getHistorialMovimientos()
             if (p.getHistorialMovimientos().isEmpty()) { 
                 System.out.println("Sin movimientos registrados.");
             } else {
-                // Itera sobre nuestra SinglyLinkedList
                 for (String registro : p.getHistorialMovimientos()) { 
                     System.out.println("  - " + registro);
                 }

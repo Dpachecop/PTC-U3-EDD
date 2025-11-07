@@ -1,29 +1,32 @@
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import java.util.List;
+import java.util.LinkedList; 
+
 
 public class Producto implements Comparable<Producto> {
     private String nombre;
     private int stockActual;
     
- 
-    // private List<String> historialMovimientos;
-    private SinglyLinkedList<String> historialMovimientos;
+
+   
+    private List<String> historialMovimientos; 
 
     public Producto(String nombre, int stockInicial) {
         this.nombre = nombre;
         this.stockActual = stockInicial;
         
- 
-        // this.historialMovimientos = new ArrayList<>();
-        this.historialMovimientos = new SinglyLinkedList<>();
-        
+    
+     
+        this.historialMovimientos = new LinkedList<>(); 
+
         if (stockInicial > 0){
            registrarMovimiento("Creación de producto con stock inicial", stockInicial);
         }
     }
 
-    // Gestiona los métodos del stock del producto
+    // (El resto de la gestión de stock no cambia)
     public void registrarEntrada(int cantidad) {
         if (cantidad > 0) {
             this.stockActual += cantidad;
@@ -44,9 +47,8 @@ public class Producto implements Comparable<Producto> {
         String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String registro = String.format("[%s] %s: %d unidades. Stock resultante: %d", fechaHora, tipo, cantidad, this.stockActual);
         
-        // --- CAMBIO ---
-        // this.historialMovimientos.add(registro);
-        this.historialMovimientos.addLast(registro); // Usamos el método de nuestra lista
+        
+        this.historialMovimientos.add(registro); // (Nativa - .add() en LinkedList añade al final)
     }
 
     // Getters
@@ -58,13 +60,12 @@ public class Producto implements Comparable<Producto> {
         return stockActual;
     }
 
-  
-    // public List<String> getHistorialMovimientos() {
-    public SinglyLinkedList<String> getHistorialMovimientos() {
+   
+    public List<String> getHistorialMovimientos() { // (Nativa)
         return historialMovimientos;
     }
 
-    // (El resto de la clase no cambia)
+ 
     @Override
     public int compareTo(Producto otro) {
         return this.nombre.compareTo(otro.getNombre());

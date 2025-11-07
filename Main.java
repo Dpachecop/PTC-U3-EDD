@@ -14,8 +14,7 @@ public class Main {
         System.out.println("--- Estado Inicial del Inventario (Sin Ordenar) ---");
         miInventario.generarReporteExistencias();
 
-        // Demostración de Ordenamiento Manual (Burbuja)
-        miInventario.ordenarPorNombreBurbuja();
+    
         miInventario.generarReporteExistencias();
         
         // Se desordena para probar el siguiente método
